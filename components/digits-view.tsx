@@ -357,7 +357,10 @@ export function DigitsView({
 
       {!editMode && !isLoading && (
         <DigitSignalAgent
-          key={`${activeSymbol?.underlying_symbol}-${tradeType}`}
+          key={`${activeAccount?.account_id ?? "public"}-${activeSymbol?.underlying_symbol}-${tradeType}`}
+          accountType={activeAccount?.account_type ?? null}
+          marketName={activeSymbol?.underlying_symbol_name ?? 'Waiting for market'}
+          proposal={proposal}
           prices={currentTick?.symbol === activeSymbol?.underlying_symbol ? prices : []}
           pipSize={pipSize}
           tradeType={tradeType}
