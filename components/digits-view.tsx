@@ -16,6 +16,7 @@ import { formatAmount } from '@/lib/locale-format';
 import { CurrentTickDisplay } from './current-tick-display';
 import { DigitStatsBar } from './digit-stats-bar';
 import { TradeControls } from './trade-controls';
+import { DigitSignalAgent } from './digit-signal-agent';
 import { ConfigurableDigitsControls, ConfigurableBuyButton } from './configurable-digits-controls';
 import { TradeTypeChips } from '@/components/custom/trade-type-chips';
 import { SymbolSelector } from '@/components/custom/symbol-selector';
@@ -82,6 +83,7 @@ export interface DigitsViewProps {
   selectSymbol: (symbol: string) => void;
   currentTick: Tick | null;
   lastDigit: number | null;
+  prices?: number[];
   digitStats: DigitStats;
   pipSize: number;
 
@@ -144,6 +146,7 @@ export function DigitsView({
   currentTick,
   lastDigit,
   digitStats,
+  prices = [],
   pipSize,
   tradeType,
   setTradeType,
@@ -350,6 +353,21 @@ export function DigitsView({
         </div>
       ) : (
         headerEl
+      )}
+
+      {!editMode && !isLoading && (
+        <DigitSignalAgent
+          key={`${activeAccount?.account_id ?? "public"}-${activeSymbol?.underlying_symbol}-${tradeType}`}
+          accountType={activeAccount?.account_type ?? null}
+          marketName={activeSymbol?.underlying_symbol_name ?? 'Waiting for market'}
+          proposal={proposal}
+          prices={currentTick?.symbol === activeSymbol?.underlying_symbol ? prices : []}
+          pipSize={pipSize}
+          tradeType={tradeType}
+          connected={isConnected && !isBuying}
+          epoch={currentTick?.symbol === activeSymbol?.underlying_symbol ? currentTick?.epoch ?? 0 : 0}
+          onApply={(mode, digit) => { setContractMode(mode); setSelectedDigit(digit); }}
+        />
       )}
 
       {appConfig ? (
